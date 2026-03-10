@@ -12,29 +12,50 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from _env_bootstrap import bootstrap_env
 
-# 执行环境自举，加载配置
-env_file = bootstrap_env()
+def get_required_config_items():
+    """返回必需配置项定义，供其他模块复用。"""
+    return {
+        "LLM_API_KEY": "LLM API密钥",
+        "EMBEDDING_API_KEY": "Embedding API密钥",
+    }
 
-# 定义必需的配置项
-required = {
-    "LLM_API_KEY": "LLM API密钥",
-    "EMBEDDING_API_KEY": "Embedding API密钥",
-}
 
-# 检测缺失的配置项
-missing = []
-for key, desc in required.items():
-    value = os.getenv(key, "")
-    if not value or value == "your_api_key_here":
-        missing.append((key, desc))
+def format_required_config_items(items=None):
+    """格式化必需配置项为可读字符串。"""
+    if items is None:
+        items = get_required_config_items()
+    return "\n".join(f"  - {key}: {desc}" for key, desc in items.items())
 
-if missing:
-    print("⚠️  检测到以下配置项缺失或未设置:\n")
-    for key, desc in missing:
-        print(f"  - {key}: {desc}")
-    print(f"\n📝 共享配置文件位置: {Path(__file__).resolve().parents[2] / 'pmem-config' / 'pmem-key.env'}")
-    print("\n请提供这些配置项，或按 Ctrl+C 退出后手动编辑共享配置文件")
-    sys.exit(1)
 
-print("✅ 配置检测通过")
-sys.exit(0)
+def get_missing_config_items(items=None):
+    """返回缺失的配置项列表。"""
+    if items is None:
+        items = get_required_config_items()
+    missing = []
+    for key, desc in items.items():
+        value = os.getenv(key, "")
+        if not value or value == "your_api_key_here":
+            missing.append((key, desc))
+    return missing
+
+
+def main():
+    # 执行环境自举，加载配置
+    bootstrap_env()
+
+    required = get_required_config_items()
+    missing = get_missing_config_items(required)
+
+    if missing:
+        print("⚠️  检测到以下配置项缺失或未设置:\n")
+        print(format_required_config_items(dict(missing)))
+        print(f"\n📝 共享配置文件位置: {Path(__file__).resolve().parents[2] / 'pmem-config' / 'pmem-key.env'}")
+        print("\n请提供这些配置项，或按 Ctrl+C 退出后手动编辑共享配置文件")
+        return 1
+
+    print("✅ 配置检测通过")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

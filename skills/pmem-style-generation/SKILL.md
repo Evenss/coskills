@@ -39,22 +39,29 @@ test -d "$ROOT_DIR/.venv" || python3 -m venv "$ROOT_DIR/.venv"
 
 **如果配置检测失败（退出码为 1）**：
 
-1. **检测输出示例**：
+1. **检测输出说明（固定文案保留在 Skill 中，仅缺失项由脚本动态输出）**：
+   ```bash
+   # 运行配置检测（脚本会动态输出“当前缺失的配置项”）
+   "$PYTHON_BIN" scripts/check_config.py
+   ```
+   
+   输出结构示例（缺失项列表以脚本实际检测结果为准）：
    ```
    ⚠️  检测到以下配置项缺失或未设置:
    
-     - LLM_API_KEY: LLM API密钥
-     - EMBEDDING_API_KEY: Embedding API密钥
+   [这里的缺失项列表由 check_config.py 动态输出]
    
    📝 共享配置文件位置: /path/to/skills/pmem-config/pmem-key.env
    
-   请提供这些配置项，或按 Ctrl+C 退出后手动编辑共享配置文件
+   你可以点击上面的共享配置文件路径，进入文件夹后手动编辑 `pmem-key.env`；
+   也可以让 Agent 在聊天框里按缺失项逐个询问你并代写入配置。完成后请回复：已配置
    ```
 
 2. **Agent 应执行以下操作**：
-   - 向用户逐个询问缺失的配置项
-   - 获取用户输入后，将配置写入 `../pmem-config/pmem-key.env`
-   - 重新运行 `check_config.py` 验证配置
+   - 先告知用户两种配置方式：手动编辑 `pmem-key.env` 或在聊天框逐项填写
+   - 若用户选择聊天填写：向用户逐个询问缺失项，获取输入后写入 `../pmem-config/pmem-key.env`
+   - 若用户选择手动编辑：等待用户完成，并要求用户明确回复“已配置”
+   - 在收到“已配置”后，重新运行 `check_config.py` 验证配置
 
 3. **写入配置示例**：
    ```bash
