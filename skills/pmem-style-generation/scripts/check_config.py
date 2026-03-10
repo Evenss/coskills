@@ -20,13 +20,6 @@ def get_required_config_items():
     }
 
 
-def format_required_config_items(items=None):
-    """格式化必需配置项为可读字符串。"""
-    if items is None:
-        items = get_required_config_items()
-    return "\n".join(f"  - {key}: {desc}" for key, desc in items.items())
-
-
 def get_missing_config_items(items=None):
     """返回缺失的配置项列表。"""
     if items is None:
@@ -47,13 +40,10 @@ def main():
     missing = get_missing_config_items(required)
 
     if missing:
-        print("⚠️  检测到以下配置项缺失或未设置:\n")
-        print(format_required_config_items(dict(missing)))
-        print(f"\n📝 共享配置文件位置: {Path(__file__).resolve().parents[2] / 'pmem-config' / 'pmem-key.env'}")
-        print("\n请提供这些配置项，或按 Ctrl+C 退出后手动编辑共享配置文件")
+        for key in missing:
+            print(key)
         return 1
 
-    print("✅ 配置检测通过")
     return 0
 
 
