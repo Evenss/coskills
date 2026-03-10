@@ -53,24 +53,22 @@ test -d "$ROOT_DIR/.venv" || python3 -m venv "$ROOT_DIR/.venv"
    
    📝 共享配置文件位置: /path/to/skills/pmem-config/pmem-key.env
    
-   你可以点击上面的共享配置文件路径，进入文件夹后手动编辑 `pmem-key.env`；
-   也可以让 Agent 在聊天框里按缺失项逐个询问你并代写入配置。完成后请回复：已配置
+   请点击上面的共享配置文件路径，进入文件夹后手动编辑文件：`pmem-key.env`。
+   手动填写完成后，返回聊天框回复：已完成
    ```
 
 2. **Agent 应执行以下操作**：
-   - 先告知用户两种配置方式：手动编辑 `pmem-key.env` 或在聊天框逐项填写
-   - 若用户选择聊天填写：向用户逐个询问缺失项，获取输入后写入 `../pmem-config/pmem-key.env`
-   - 若用户选择手动编辑：等待用户完成，并要求用户明确回复“已配置”
-   - 在收到“已配置”后，重新运行 `check_config.py` 验证配置
+   - 明确告知用户共享配置目录路径：`../pmem-config/`
+   - 明确告知用户需要编辑的文件名：`pmem-key.env`
+   - 不在对话中逐项收集配置值，仅等待用户手动填写
+   - 用户回复“已完成”后，重新运行 `check_config.py` 验证配置
 
 3. **写入配置示例**：
    ```bash
-   # 假设用户提供了 LLM_API_KEY=sk-xxxxx 和 EMBEDDING_API_KEY=sk-yyyyy
-   # 更新共享配置文件
-   cat >> ../pmem-config/pmem-key.env << 'EOF'
+   # 用户手动打开并编辑：../pmem-config/pmem-key.env
+   # 在文件中填写缺失项，例如：
    LLM_API_KEY=sk-xxxxx
    EMBEDDING_API_KEY=sk-yyyyy
-   EOF
    
    # 重新检测
    "$PYTHON_BIN" scripts/check_config.py
